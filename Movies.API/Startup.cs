@@ -1,4 +1,9 @@
 using Microsoft.OpenApi.Models;
+using Movies.Application.Commands;
+using Movies.Core.Repositories;
+using Movies.Core.Repositories.Generic;
+using Movies.Infrastructure.Data;
+using Movies.Infrastructure.Repositories;
 
 namespace Movies.API
 {
@@ -18,6 +23,12 @@ namespace Movies.API
             {
                 swagg.SwaggerDoc("v1", new OpenApiInfo { Title = "Movies API", Version = "v1" });
             });
+
+            services.AddDbContext<MovieContext>();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(CreateMovieCommand)));
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddTransient<IMovieRepository, MovieRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
