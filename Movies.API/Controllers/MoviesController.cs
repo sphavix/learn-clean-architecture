@@ -1,8 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Movies.Application.Commands;
 using Movies.Application.Queries;
 using Movies.Application.Responses;
+using Movies.Core.Entities;
 
 namespace Movies.API.Controllers
 {
@@ -17,11 +19,20 @@ namespace Movies.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieResponse>>> GetMoviesByDirectorName(string name)
+        public async Task<ActionResult<IEnumerable<MovieResponse>>> GetMovies()
         {
-            var query = new GetMoviesByDirectorNameQuery(name);
-            var movies = await _mediator.Send(query);
-            return Ok(movies);
+            var movies = new GetMoviesQuery();
+            var result = await _mediator.Send(movies);
+            return Ok(result);
+        } 
+        
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MovieResponse>> GetMovie(Guid id)
+        {
+            var movie = new GetMovieByIdQuery(id);
+            var result = await _mediator.Send(movie);
+            return Ok(result);
+
         }
 
         [HttpPost]
@@ -29,6 +40,20 @@ namespace Movies.API.Controllers
         public async Task<ActionResult<MovieResponse>> CreateMovie([FromBody] CreateMovieCommand command)
         {
             var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateMovie([FromBody] UpdateMovieCommand command)
+        {
+            var movie = await _mediator.Send(command);
+            return Ok(movie);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMovie(Guid id)
+        {
+            var result = await _mediator.Send(new DeleteMovieCommand { Id = id });
             return Ok(result);
         }
     }

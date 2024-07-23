@@ -1,7 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Movies.Application.Commands;
+using Movies.Application.Handlers;
 using Movies.Core.Repositories;
-using Movies.Core.Repositories.Generic;
 using Movies.Infrastructure.Data;
 using Movies.Infrastructure.Repositories;
 
@@ -26,9 +26,8 @@ namespace Movies.API
 
             services.AddDbContext<MovieContext>();
             services.AddAutoMapper(typeof(Startup));
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(CreateMovieCommand)));
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddTransient<IMovieRepository, MovieRepository>();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(CreateMovieCommandHandler)));
+            services.AddScoped<IMovieRepository, MovieRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
